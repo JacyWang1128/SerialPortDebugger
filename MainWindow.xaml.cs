@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -43,8 +44,9 @@ public partial class MainWindow : Window
             CaptionHeight = 0,              // 自定义标题栏，不需要系统标题
             ResizeBorderThickness = new Thickness(6),
             CornerRadius = new CornerRadius(8),
-            GlassFrameThickness = new Thickness(0),
-            UseAeroCaptionButtons = false
+            GlassFrameThickness = new Thickness(1000),
+            UseAeroCaptionButtons = false,
+            NonClientFrameEdges = NonClientFrameEdges.None
         };
         WindowChrome.SetWindowChrome(this, chrome);
 
@@ -57,10 +59,14 @@ public partial class MainWindow : Window
         UpdateMaximizeState();
     }
 
+    Rect? originSize = null;
+
     private void UpdateMaximizeState()
     {
-        if (WindowState == WindowState.Maximized)
+        if (IsMax)//WindowState == WindowState.Maximized)
         {
+            originSize = new Rect() { X = this.Left, Y = this.Top, Width = this.Width, Height = this.Height };
+
             // 限制窗口不覆盖任务栏
             var wa = SystemParameters.WorkArea;
             Left = wa.Left;
@@ -76,6 +82,13 @@ public partial class MainWindow : Window
         }
         else
         {
+            if (originSize.HasValue)
+            {
+                this.Height = originSize.Value.Height;
+                this.Width = originSize.Value.Width;
+                this.Top = originSize.Value.Top;
+                this.Left = originSize.Value.Left;
+            }
             WindowBorder.CornerRadius = new CornerRadius(8);
             WindowBorder.BorderThickness = new Thickness(1);
             TitleBar.CornerRadius = new CornerRadius(8, 8, 0, 0);
@@ -89,7 +102,7 @@ public partial class MainWindow : Window
         if (e.ClickCount == 2)
         {
             // 双击标题栏切换最大化/还原
-            ToggleMaximize();
+            IsMax = !IsMax;
         }
         else if (e.ButtonState == MouseButtonState.Pressed)
         {
@@ -102,16 +115,28 @@ public partial class MainWindow : Window
         WindowState = WindowState.Minimized;
     }
 
+    bool isMax = false;
+    public bool IsMax
+    {
+        get { return isMax; }
+        set
+        {
+            isMax = value;
+            UpdateMaximizeState();
+        }
+    }
+
     private void BtnMaximize_Click(object sender, RoutedEventArgs e)
     {
-        ToggleMaximize();
+        IsMax = !IsMax;
     }
 
     private void ToggleMaximize()
     {
-        WindowState = WindowState == WindowState.Maximized
-            ? WindowState.Normal
-            : WindowState.Maximized;
+        if (WindowState == WindowState.Normal)
+            UpdateMaximizeState();
+        else
+            WindowState = WindowState.Normal;
     }
 
     private void BtnClose_Click(object sender, RoutedEventArgs e)

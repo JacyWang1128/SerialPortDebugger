@@ -451,10 +451,13 @@
                     <StackPanel Grid.Column="1" Orientation="Horizontal"
                                 VerticalAlignment="Top">
                         <Button Style="{StaticResource WinButton}"
+                                Background="Transparent"
+                                WindowChrome.IsHitTestVisibleInChrome="True"
                                 Content="─" FontSize="12"
                                 Click="BtnMinimize_Click"
                                 ToolTip="最小化"/>
                         <Button x:Name="BtnMaximize"
+                                WindowChrome.IsHitTestVisibleInChrome="True"
                                 Style="{StaticResource WinButton}"
                                 Content="□" FontSize="12"
                                 Click="BtnMaximize_Click"
