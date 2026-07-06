@@ -1,4 +1,3 @@
-using System.Drawing;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
